@@ -45,7 +45,12 @@ function setCountdown(time) {
   timerId = setInterval(() => {
     time = time - 1000;
     setTimeValues(convertMs(time));
-    if (convertMs(time).seconds === 0) {
+    const stopCondition =
+      convertMs(time).seconds === 0 &&
+      convertMs(time).minutes === 0 &&
+      convertMs(time).hours === 0 &&
+      convertMs(time).days === 0;
+    if (stopCondition) {
       endCountdown(timerId);
     }
   }, 1000);
