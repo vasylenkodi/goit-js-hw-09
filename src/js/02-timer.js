@@ -7,7 +7,6 @@ import "notiflix/dist/notiflix-3.2.6.min.css";
 const refs = {
   inputElement: document.querySelector("#datetime-picker"),
   startBtn: document.querySelector("[data-start]"),
-  valueElements: document.querySelectorAll(".value"),
 };
 
 let timerId = null;
