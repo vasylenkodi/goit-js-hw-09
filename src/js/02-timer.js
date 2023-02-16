@@ -1,6 +1,9 @@
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
+import { Notify } from "notiflix/build/notiflix-notify-aio";
+import "notiflix/dist/notiflix-3.2.6.min.css";
+
 const refs = {
   inputElement: document.querySelector("#datetime-picker"),
   startBtn: document.querySelector("[data-start]"),
@@ -8,6 +11,8 @@ const refs = {
 };
 
 let timerId = null;
+let currentDate = null;
+let selectedDate = null;
 
 refs.startBtn.setAttribute("disabled", true);
 
@@ -18,18 +23,15 @@ const options = {
   minuteIncrement: 1,
   onClose(selectedDates) {
     if (this._initialDate > selectedDates[0]) {
-      window.alert("Please choose a date in the future");
+      Notify.warning("Please choose a date in the future");
       return;
     }
-    refs.startBtn.removeAttribute("disabled");
-    refs.startBtn.addEventListener("click", () => {
-      let time = selectedDates[0].getTime() - this.now.getTime();
-      setTimeValues(convertMs(time));
-      clearInterval(timerId);
-      setCountdown(time);
-    });
+    currentDate = this.now;
+    selectedDate = selectedDates[0];
+    activateBtn();
   },
 };
+
 
 flatpickr(refs.inputElement, options);
 
@@ -43,10 +45,10 @@ function setTimeValues(timeUnits) {
 function setCountdown(time) {
   timerId = setInterval(() => {
     time = time - 1000;
-      setTimeValues(convertMs(time));
-      if (convertMs(time).seconds === 0) {
-        endCountdown(timerId);
-      }
+    setTimeValues(convertMs(time));
+    if (convertMs(time).seconds === 0) {
+      endCountdown(timerId);
+    }
   }, 1000);
 }
 
@@ -75,4 +77,16 @@ function convertMs(ms) {
 
 function addLeadingZero(value) {
   return value.toString().padStart(2, "0");
+}
+
+function activateBtn() {
+  refs.startBtn.removeAttribute("disabled");
+  refs.startBtn.addEventListener("click", onStartBtnClick);
+}
+
+function onStartBtnClick() {
+  let time = selectedDate.getTime() - currentDate.getTime();
+  setTimeValues(convertMs(time));
+  clearInterval(timerId);
+  setCountdown(time);
 }
